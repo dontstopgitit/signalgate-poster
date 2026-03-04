@@ -264,6 +264,35 @@
       </div>
     </div>
 
+    <!-- KPI DASHBOARD -->
+
+    <div class="card">
+    <div class="label">SignalGate KPI Dashboard</div>
+    <div class="meta">Quick daily tracking</div>
+  
+    <div class="kv">
+      <b>Replies</b> <div id="kpiReplies">0</div>
+      <b>Posts</b> <div id="kpiPosts">0</div>
+      <b>DMs</b> <div id="kpiDMs">0</div>
+      <b>Demo Runs</b> <div id="kpiRuns">0</div>
+    </div>
+  
+    <div class="btnrow">
+      <button class="ghost" onclick="incKPI('replies')">+ Reply</button>
+      <button class="ghost" onclick="incKPI('posts')">+ Post</button>
+      <button class="ghost" onclick="incKPI('dms')">+ DM</button>
+      <button class="open" onclick="incKPI('runs')">+ Demo Run</button>
+    </div>
+  
+    <div class="btnrow">
+      <button class="danger" onclick="resetKPI()">Reset Day</button>
+    </div>
+  
+    <div class="small">
+      Use + buttons while working groups. Reset each morning.
+    </div>
+  </div>
+    
     <!-- DAILY PLAYBOOK -->
     <div class="card">
       <div class="label">Daily Playbook</div>
@@ -767,6 +796,65 @@ async function copyTrackingSummary(){
 
 }
 
+// ------------------------------
+// KPI Tracking
+// ------------------------------
+
+function getKPI(){
+
+  return JSON.parse(localStorage.getItem("sg_kpi")) || {
+    replies:0,
+    posts:0,
+    dms:0,
+    runs:0
+  }
+
+}
+
+function saveKPI(data){
+
+  localStorage.setItem("sg_kpi", JSON.stringify(data))
+
+}
+
+function renderKPI(){
+
+  const kpi = getKPI()
+
+  document.getElementById("kpiReplies").textContent = kpi.replies
+  document.getElementById("kpiPosts").textContent = kpi.posts
+  document.getElementById("kpiDMs").textContent = kpi.dms
+  document.getElementById("kpiRuns").textContent = kpi.runs
+
+}
+
+function incKPI(type){
+
+  const kpi = getKPI()
+
+  if(kpi[type] !== undefined){
+
+    kpi[type]++
+
+    saveKPI(kpi)
+
+    renderKPI()
+
+    toast("+1 " + type)
+
+  }
+
+}
+
+function resetKPI(){
+
+  localStorage.removeItem("sg_kpi")
+
+  renderKPI()
+
+  toast("Daily KPI reset")
+
+}
 
 // ------------------------------
 // UI Rendering
@@ -892,6 +980,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   renderDM()
 
+  renderKPI()
+  
   setActivePill(getSrc())
 
 })
