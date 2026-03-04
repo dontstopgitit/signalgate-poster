@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SignalGate Posting Kit</title>
+
+
+<style>
+
+  body{
+    margin:0;
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    background:#f4f6fb;
+    color:#0f172a;
+    padding:16px;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .topbar{
+    position:sticky;
+    top:0;
+    background:#f4f6fb;
+    padding:10px 0 14px 0;
+    z-index:10;
+  }
+
+  h1{
+    margin:0 0 6px 0;
+    font-size:18px;
+    letter-spacing:-0.02em;
+  }
+
+  .sub{
+    font-size:12px;
+    color:#64748b;
+  }
+
+  .grid{
+    display:grid;
+    gap:14px;
+    margin-top:12px;
+  }
+
+  .card{
+    background:#fff;
+    border:1px solid #e5e7eb;
+    border-radius:14px;
+    padding:14px;
+    box-shadow:0 6px 18px rgba(15,23,42,0.06);
+  }
+
+  .label{
+    font-weight:800;
+    font-size:14px;
+    margin-bottom:6px;
+  }
+
+  .meta{
+    font-size:11px;
+    color:#64748b;
+    margin-bottom:8px;
+    line-height:1.4;
+  }
+
+  .pillrow{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-top:8px;
+  }
+
+  .pill{
+    font-size:11px;
+    padding:6px 10px;
+    border-radius:999px;
+    border:1px solid #e5e7eb;
+    background:#fff;
+    color:#0f172a;
+    cursor:pointer;
+    user-select:none;
+    font-weight:700;
+    transition:all .12s ease;
+  }
+
+  .pill:hover{
+    background:#f1f5f9;
+  }
+
+  .pill.active{
+    border-color:#6366f1;
+    background:#eef2ff;
+  }
+
+  textarea{
+    width:100%;
+    min-height:140px;
+    resize:vertical;
+    border:1px solid #e5e7eb;
+    border-radius:10px;
+    padding:10px;
+    font-size:13px;
+    line-height:1.5;
+    outline:none;
+    box-sizing:border-box;
+    font-family:inherit;
+  }
+
+  textarea:focus{
+    border-color:#6366f1;
+  }
+
+  .btnrow{
+    display:flex;
+    gap:10px;
+    margin-top:10px;
+    flex-wrap:wrap;
+  }
+
+  button{
+    appearance:none;
+    border:none;
+    border-radius:10px;
+    padding:12px 14px;
+    font-weight:800;
+    font-size:14px;
+    cursor:pointer;
+    transition:all .12s ease;
+  }
+
+  button:active{
+    transform:scale(.98);
+  }
+
+  .copy{background:#111827;color:white;}
+  .open{background:#2f80ed;color:white;}
+  .ghost{background:#eef2ff;color:#1e293b;border:1px solid #c7d2fe;}
+  .search{background:#10b981;color:white;}
+  .danger{background:#ef4444;color:white;}
+
+  .warn{
+    background:#fef3c7;
+    border:1px solid #f59e0b;
+    padding:12px;
+    border-radius:10px;
+    font-size:12px;
+    line-height:1.5;
+    color:#111827;
+  }
+
+  .kv{
+    display:grid;
+    grid-template-columns:120px 1fr;
+    gap:8px 10px;
+    font-size:12px;
+    color:#0f172a;
+    margin-top:10px;
+  }
+
+  .kv b{
+    color:#64748b;
+    font-weight:800;
+  }
+
+  .toast{
+    position:fixed;
+    left:50%;
+    bottom:18px;
+    transform:translateX(-50%);
+    background:#111827;
+    color:white;
+    padding:10px 14px;
+    border-radius:999px;
+    font-size:13px;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .15s ease;
+    z-index:9999;
+  }
+
+  .toast.show{
+    opacity:1;
+  }
+
+  .small{
+    font-size:11px;
+    color:#64748b;
+    margin-top:8px;
+    line-height:1.35;
+  }
+
+  .hr{
+    height:1px;
+    background:#e5e7eb;
+    margin:12px 0;
+    border-radius:999px;
+  }
+
+
+  /* ------------------------------
+  Mobile improvements
+  ------------------------------ */
+
+  @media (max-width:600px){
+
+    body{
+      padding:14px;
+    }
+
+    button{
+      width:100%;
+    }
+
+    .btnrow{
+      flex-direction:column;
+    }
+
+    textarea{
+      font-size:14px;
+    }
+
+  }
+
+  </style>
+</head>
+
+<body>
+
+  <div class="topbar">
+    <h1>SignalGate Posting Kit</h1>
+    <div class="sub">Thread hunt → reply → DM → demo → track</div>
+  </div>
+
+  <div class="grid">
+
+    <!-- SOURCE / TRACKING CONTROL -->
+    <div class="card">
+      <div class="label">Source Tracking</div>
+      <div class="meta">
+        Pick the group/channel you’re working right now. All demo links generated from this kit will auto-tag with <b>?src=</b>.
+      </div>
+
+      <div class="pillrow" id="sourcePills">
+        <div class="pill" data-src="mastermind">Mastermind</div>
+        <div class="pill" data-src="leadhacks">Lead Hacks</div>
+        <div class="pill" data-src="wholesale">Wholesale</div>
+        <div class="pill" data-src="allthings">All Things RE</div>
+        <div class="pill" data-src="agentloan">Agent & Loan</div>
+        <div class="pill" data-src="dm">DM</div>
+      </div>
+
+      <div class="kv">
+        <b>Current src</b> <div id="currentSrc">unknown</div>
+        <b>Demo link</b> <div id="currentDemoLink" style="word-break:break-all;"></div>
+      </div>
+
+      <div class="btnrow">
+        <button class="open" onclick="openTrackedDemo()">Open Demo (Tracked)</button>
+        <button class="copy" onclick="copyTrackedDemo()">Copy Demo Link</button>
+        <button class="ghost" onclick="copyTrackedDemoWithLabel()">Copy Demo Link + Label</button>
+      </div>
+
+      <div class="small">
+        Tip: when you paste in comments, use “copy link + label” so you know what you dropped where later.
+      </div>
+    </div>
+
+    <!-- DAILY PLAYBOOK -->
+    <div class="card">
+      <div class="label">Daily Playbook</div>
+      <div class="meta">No thinking required.</div>
+
+      <textarea readonly>
+SIGNALGATE DAILY ROUTINE
+
+MORNING (10 minutes)
+1) Open group
+2) Find appraisal threads
+3) Reply 3–5 times (no links)
+
+Use:
+- Reply #1
+
+Then post:
+- Post #1 (only after you’ve replied)
+
+
+MIDDAY (5 minutes)
+Reply to appraisal gap / low appraisal threads
+
+Use:
+- Reply #2
+
+
+EVENING (5 minutes)
+1) Check notifications / comments
+2) If someone asks “link?” → DM tracked demo link
+3) If someone asks “pricing?” → DM Gumroad
+
+Daily Target:
+- 5 replies
+- 1 post
+- 2 DMs
+      </textarea>
+    </div>
+
+    <!-- THREAD FINDER -->
+    <div class="card">
+      <div class="label">Thread Finder</div>
+      <div class="meta">
+        Desktop: tap buttons to open searches.  
+        Mobile: copy links and open in Facebook search.
+      </div>
+
+      <!-- DESKTOP VERSION -->
+      <div id="threadFinderDesktop">
+        <div class="btnrow">
+          <button class="search" onclick="openLink('https://www.facebook.com/search/posts/?q=appraisal')">Appraisal</button>
+
+          <button class="search" onclick="openLink('https://www.facebook.com/search/posts/?q=appraisal%20gap')">Appraisal Gap</button>
+
+          <button class="search" onclick="openLink('https://www.facebook.com/search/posts/?q=low%20appraisal')">Low Appraisal</button>
+
+          <button class="search" onclick="openLink('https://www.facebook.com/search/posts/?q=deal%20fell%20through')">Deal Fell Through</button>
+
+          <button class="search" onclick="openFiveThreads()">Auto Open 5</button>
+        </div>
+      </div>
+
+      <!-- MOBILE VERSION -->
+      <div id="threadFinderMobile" style="display:none;">
+
+        <textarea id="searchLinks" readonly>
+
+    Facebook Search Links
+
+    Appraisal
+    https://www.facebook.com/search/posts/?q=appraisal
+
+    Appraisal Gap
+    https://www.facebook.com/search/posts/?q=appraisal%20gap
+
+    Low Appraisal
+    https://www.facebook.com/search/posts/?q=low%20appraisal
+
+    Deal Fell Through
+    https://www.facebook.com/search/posts/?q=deal%20fell%20through
+
+        </textarea>
+
+        <div class="btnrow">
+          <button class="copy" onclick="copyText('searchLinks')">Copy Search Links</button>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- GROUP RULES -->
+    <div class="card">
+      <div class="label">Group Rules Cheat Sheet</div>
+      <div class="meta">Default posture: be helpful first. Links belong in DM unless the group is clearly link-friendly.</div>
+
+      <div class="warn">
+        <b>Real Estate Mastermind</b><br>
+        ✔ Discussion posts OK • ✔ Replies OK • ⚠ Avoid “tool pitch” tone<br><br>
+
+        <b>Lead Hacks Mastermind</b><br>
+        ✔ Lead-gen discussion • ✔ Replies OK • ⚠ Don’t carpet-bomb CTAs<br><br>
+
+        <b>Wholesale Real Estate</b><br>
+        ✔ Replies OK • ✔ Investor-focused posts OK • ✖ No funnel-y promos / “bait”<br><br>
+
+        <b>All Things Real Estate</b><br>
+        ✔ Replies OK • ⚠ Keep it casual/human • ✖ Don’t sound like marketing copy<br><br>
+
+        <b>Agent & Loan Officer</b><br>
+        ✔ Replies OK • ⚠ Comment first • ✖ Avoid posting tools / promotions
+      </div>
+    </div>
+
+    <!-- POST 1 -->
+    <div class="card">
+      <div class="label">Post #1 — Question Hook</div>
+      <div class="meta">Best AFTER you’ve replied in the group that day.</div>
+
+      <textarea id="post1">
+Quick question:
+
+How often are deals dying because the appraisal came in low?
+
+I built a simple “Appraisal Risk Gate” that stress tests an offer against lender mechanics (lender funds the LOWER of purchase price vs appraisal).
+
+If anyone wants, I can run a quick check.
+
+Drop:
+• offer price
+• comp support estimate
+• down payment %
+      </textarea>
+
+      <div class="btnrow">
+        <button class="copy" onclick="copyText('post1')">Copy Post</button>
+        <button class="ghost" onclick="clearBox('post1')">Clear</button>
+      </div>
+    </div>
+
+    <!-- POST 2 -->
+    <div class="card">
+      <div class="label">Post #2 — Insight</div>
+      <div class="meta">Use as a follow-up post (or when a thread is already hot).</div>
+
+      <textarea id="post2">
+Most contracts don’t fail at signing.
+
+They fail when underwriting applies the rule:
+“Lender funds the LOWER of purchase price or appraised value.”
+
+So if appraisal comes in low, the buyer brings cash or renegotiates.
+
+I built a quick stress test that shows if the structure survives.
+
+If you want, drop offer + comp support + down % and I’ll run it.
+      </textarea>
+
+      <div class="btnrow">
+        <button class="copy" onclick="copyText('post2')">Copy Post</button>
+        <button class="ghost" onclick="clearBox('post2')">Clear</button>
+      </div>
+    </div>
+
+    <!-- REPLY 1 -->
+    <div class="card">
+      <div class="label">Reply #1 — Helpful</div>
+      <div class="meta">Use inside appraisal / appraisal gap threads.</div>
+
+      <textarea id="reply1">
+Yep — appraisal gaps kill deals because lenders fund the LOWER of purchase price or appraised value.
+
+So if appraisal comes in low, the buyer has to bring cash to close (or renegotiate).
+
+If helpful, share offer + comp support + down payment % and I’ll stress test the structure.
+      </textarea>
+
+      <div class="btnrow">
+        <button class="copy" onclick="copyText('reply1')">Copy Reply</button>
+        <button class="ghost" onclick="clearBox('reply1')">Clear</button>
+      </div>
+    </div>
+
+    <!-- REPLY 2 -->
+    <div class="card">
+      <div class="label">Reply #2 — Short</div>
+      <div class="meta">Use when someone says “came in $X low”.</div>
+
+      <textarea id="reply2">
+Most buyers miss this:
+
+Lenders fund the LOWER of purchase price or appraisal.
+
+So if appraisal comes in $30k low, the buyer has to bring that cash (or renegotiate).
+
+If you want, I can run a quick stress test.
+      </textarea>
+
+      <div class="btnrow">
+        <button class="copy" onclick="copyText('reply2')">Copy Reply</button>
+        <button class="ghost" onclick="clearBox('reply2')">Clear</button>
+      </div>
+    </div>
+
+    <!-- DM TEMPLATE (AUTO-INJECTS TRACKED LINK) -->
+    <div class="card">
+      <div class="label">DM Template (Tracked)</div>
+      <div class="meta">This auto-inserts your currently selected tracked demo link.</div>
+
+      <textarea id="dm1"></textarea>
+
+      <div class="btnrow">
+        <button class="copy" onclick="copyText('dm1')">Copy DM</button>
+        <button class="open" onclick="openTrackedDemo()">Open Demo (Tracked)</button>
+        <button class="ghost" onclick="openLink('https://7771435393392.gumroad.com/l/ygkkp')">Open Gumroad</button>
+      </div>
+
+      <div class="small">
+        If the group is strict: don’t paste links in comments. Reply → “Want the link?” → DM this.
+      </div>
+    </div>
+
+    <!-- QUICK LINKS -->
+    <div class="card">
+      <div class="label">Links</div>
+      <div class="meta">One-tap open.</div>
+
+      <div class="btnrow">
+        <button class="open" onclick="openTrackedDemo()">Open Demo (Tracked)</button>
+        <button class="ghost" onclick="openLink('https://signalgatehq.com')">SignalGate</button>
+        <button class="ghost" onclick="openLink('https://7771435393392.gumroad.com/l/ygkkp')">Gumroad</button>
+      </div>
+    </div>
+
+    <!-- GROUP LAUNCHERS -->
+    <div class="card">
+      <div class="label">Groups</div>
+      <div class="meta">Tap → open group. (Remember to set the Source pill first.)</div>
+
+      <div class="btnrow">
+        <button class="ghost" onclick="setSrc('mastermind'); openLink('https://www.facebook.com/groups/realestatemastermindgroup/')">Mastermind</button>
+        <button class="ghost" onclick="setSrc('leadhacks'); openLink('https://www.facebook.com/groups/RealEstateLeadHacksAndMastermindGroup/')">Lead Hacks</button>
+        <button class="ghost" onclick="setSrc('wholesale'); openLink('https://www.facebook.com/groups/370042743200581/')">Wholesale</button>
+        <button class="ghost" onclick="setSrc('allthings'); openLink('https://www.facebook.com/groups/allthingsrealestateagents/')">All Things</button>
+        <button class="ghost" onclick="setSrc('agentloan'); openLink('https://www.facebook.com/groups/2875414289352101/')">Agent & Loan</button>
+      </div>
+
+      <div class="hr"></div>
+
+      <div class="btnrow">
+        <button class="danger" onclick="resetTracking()">Reset Tracking</button>
+        <button class="ghost" onclick="copyTrackingSummary()">Copy Tracking Summary</button>
+      </div>
+
+      <div class="small">
+        “Copy Tracking Summary” is useful if you want to paste today’s operating context into Notes.
+      </div>
+    </div>
+
+  </div>
+
+  <div id="toast" class="toast">Copied</div>
+
+<script>
+
+// ------------------------------
+// Config
+// ------------------------------
+
+const DEMO_BASE = "https://try-appraisal.signalgatehq.com/"
+const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+
+
+// ------------------------------
+// Toast
+// ------------------------------
+
+function toast(msg){
+
+  const t=document.getElementById("toast")
+
+  t.textContent=msg || "Copied"
+
+  t.classList.add("show")
+
+  setTimeout(()=>{
+    t.classList.remove("show")
+  },900)
+
+}
+
+
+// ------------------------------
+// Clipboard
+// ------------------------------
+
+async function copyText(id){
+
+  const el=document.getElementById(id)
+
+  const text = el.value || el.textContent || ""
+
+  try{
+
+    if(navigator.clipboard && window.isSecureContext){
+
+      await navigator.clipboard.writeText(text)
+
+    }else{
+
+      fallbackCopy(text)
+
+    }
+
+    toast("Copied ✅")
+
+  }catch{
+
+    fallbackCopy(text)
+
+    toast("Copied ✅")
+
+  }
+
+}
+
+
+function fallbackCopy(text){
+
+  const ta=document.createElement("textarea")
+
+  ta.value=text
+
+  ta.style.position="fixed"
+  ta.style.left="-9999px"
+
+  document.body.appendChild(ta)
+
+  ta.focus()
+  ta.select()
+
+  document.execCommand("copy")
+
+  document.body.removeChild(ta)
+
+}
+
+
+// ------------------------------
+// Clear textbox
+// ------------------------------
+
+function clearBox(id){
+
+  const el=document.getElementById(id)
+
+  el.value=""
+
+  toast("Cleared")
+
+}
+
+
+// ------------------------------
+// Link opener
+// ------------------------------
+
+function openLink(url){
+
+  if(isMobile){
+
+    location.href = url
+
+  }else{
+
+    window.open(url,"_blank")
+
+  }
+
+}
+
+
+// ------------------------------
+// Tracking
+// ------------------------------
+
+function getSrc(){
+
+  return localStorage.getItem("sg_src") || "unknown"
+
+}
+
+
+function setSrc(src){
+
+  localStorage.setItem("sg_src", src)
+
+  renderSrc()
+  renderDM()
+  setActivePill(src)
+
+  toast("Source set: " + src)
+
+}
+
+
+function getTrackedDemoUrl(){
+
+  const src = encodeURIComponent(getSrc())
+
+  return DEMO_BASE + "?src=" + src
+
+}
+
+
+function openTrackedDemo(){
+
+  openLink(getTrackedDemoUrl())
+
+}
+
+
+async function copyTrackedDemo(){
+
+  const url = getTrackedDemoUrl()
+
+  try{
+
+    await navigator.clipboard.writeText(url)
+
+  }catch{
+
+    fallbackCopy(url)
+
+  }
+
+  toast("Demo link copied ✅")
+
+}
+
+
+async function copyTrackedDemoWithLabel(){
+
+  const src = getSrc()
+
+  const url = getTrackedDemoUrl()
+
+  const text = `SignalGate Demo (${src})\n${url}`
+
+  try{
+
+    await navigator.clipboard.writeText(text)
+
+  }catch{
+
+    fallbackCopy(text)
+
+  }
+
+  toast("Copied ✅")
+
+}
+
+
+function resetTracking(){
+
+  localStorage.removeItem("sg_src")
+
+  renderSrc()
+  renderDM()
+  setActivePill("unknown")
+
+  toast("Tracking reset")
+
+}
+
+
+async function copyTrackingSummary(){
+
+  const src = getSrc()
+
+  const demo = getTrackedDemoUrl()
+
+  const text =
+`SignalGate Posting Context
+- src: ${src}
+- demo: ${demo}
+- time: ${new Date().toISOString()}`
+
+  try{
+
+    await navigator.clipboard.writeText(text)
+
+  }catch{
+
+    fallbackCopy(text)
+
+  }
+
+  toast("Copied ✅")
+
+}
+
+
+// ------------------------------
+// UI Rendering
+// ------------------------------
+
+function renderSrc(){
+
+  const src = getSrc()
+
+  const link = getTrackedDemoUrl()
+
+  document.getElementById("currentSrc").textContent = src
+
+  document.getElementById("currentDemoLink").textContent = link
+
+}
+
+
+function renderDM(){
+
+  const src = getSrc()
+
+  const link = getTrackedDemoUrl()
+
+  const dm =
+`Here’s the demo (${src}):
+
+${link}
+
+If you want Investor Access (20 runs/day):
+https://7771435393392.gumroad.com/l/ygkkp`
+
+  const dmBox = document.getElementById("dm1")
+
+  if(dmBox){
+    dmBox.value = dm
+  }
+
+}
+
+
+function setActivePill(src){
+
+  const pills=document.querySelectorAll("#sourcePills .pill")
+
+  pills.forEach(p => p.classList.remove("active"))
+
+  pills.forEach(p => {
+
+    if(p.getAttribute("data-src") === src){
+
+      p.classList.add("active")
+
+    }
+
+  })
+
+}
+
+
+// ------------------------------
+// Thread opener
+// ------------------------------
+
+function openFiveThreads(){
+
+  const urls=[
+
+    "https://www.facebook.com/search/posts/?q=appraisal",
+    "https://www.facebook.com/search/posts/?q=appraisal%20gap",
+    "https://www.facebook.com/search/posts/?q=low%20appraisal",
+    "https://www.facebook.com/search/posts/?q=deal%20fell%20through",
+    "https://www.facebook.com/search/posts/?q=house%20appraisal"
+
+  ]
+
+  if(isMobile){
+
+    location.href = urls[0]
+
+  }else{
+
+    urls.forEach(url => window.open(url,"_blank"))
+
+  }
+
+}
+
+
+// ------------------------------
+// Init
+// ------------------------------
+
+document.addEventListener("DOMContentLoaded", () => {
+
+  // mobile thread finder switch
+
+  if(isMobile){
+
+    const d=document.getElementById("threadFinderDesktop")
+
+    const m=document.getElementById("threadFinderMobile")
+
+    if(d) d.style.display="none"
+
+    if(m) m.style.display="block"
+
+  }
+
+  // source pills
+
+  document.querySelectorAll("#sourcePills .pill").forEach(pill => {
+
+    pill.addEventListener("click", () => {
+
+      setSrc(pill.getAttribute("data-src"))
+
+    })
+
+  })
+
+  renderSrc()
+
+  renderDM()
+
+  setActivePill(getSrc())
+
+})
+
+</script>
+
+</body>
+</html>
