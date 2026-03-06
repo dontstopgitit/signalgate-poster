@@ -593,7 +593,7 @@ async function copyText(id){
 
   const el=document.getElementById(id)
 
-  const text = el.value || el.textContent || ""
+  const text = (el.value ?? el.textContent ?? "").trim()
 
   try{
 
@@ -664,16 +664,15 @@ function openLink(url){
 
   if(isMobile){
 
-    location.href = url
+    window.location.href = url
 
   }else{
 
-    window.open(url,"_blank")
+    window.open(url,"_blank","noopener")
 
   }
 
 }
-
 
 // ------------------------------
 // Tracking
@@ -703,7 +702,7 @@ function getTrackedDemoUrl(){
 
   const src = encodeURIComponent(getSrc())
 
-  return DEMO_BASE + "?src=" + src
+  return `${DEMO_BASE}?src=${src}&campaign=reply1&thread=generic&dealType=agent`
 
 }
 
@@ -821,6 +820,8 @@ function renderKPI(){
 
   const kpi = getKPI()
 
+  if(!document.getElementById("kpiReplies")) return
+
   document.getElementById("kpiReplies").textContent = kpi.replies
   document.getElementById("kpiPosts").textContent = kpi.posts
   document.getElementById("kpiDMs").textContent = kpi.dms
@@ -933,7 +934,7 @@ function openFiveThreads(){
 
   if(isMobile){
 
-    location.href = urls[0]
+    window.location.href = urls[0]
 
   }else{
 
@@ -977,11 +978,8 @@ document.addEventListener("DOMContentLoaded", () => {
   })
 
   renderSrc()
-
   renderDM()
-
   renderKPI()
-  
   setActivePill(getSrc())
 
 })
