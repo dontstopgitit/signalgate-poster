@@ -572,10 +572,10 @@ const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
 
 function toast(msg){
 
-  const t=document.getElementById("toast")
+  const t = document.getElementById("toast")
+  if(!t) return
 
-  t.textContent=msg || "Copied"
-
+  t.textContent = msg || "Copied"
   t.classList.add("show")
 
   setTimeout(()=>{
@@ -591,43 +591,35 @@ function toast(msg){
 
 async function copyText(id){
 
-  const el=document.getElementById(id)
+  const el = document.getElementById(id)
+  if(!el) return
 
   const text = (el.value ?? el.textContent ?? "").trim()
 
   try{
 
     if(navigator.clipboard && window.isSecureContext){
-
       await navigator.clipboard.writeText(text)
-
     }else{
-
       fallbackCopy(text)
-
     }
 
     toast("Copied ✅")
 
   }catch{
-
     fallbackCopy(text)
-
     toast("Copied ✅")
-
   }
 
 }
 
-
 function fallbackCopy(text){
 
-  const ta=document.createElement("textarea")
+  const ta = document.createElement("textarea")
 
-  ta.value=text
-
-  ta.style.position="fixed"
-  ta.style.left="-9999px"
+  ta.value = text
+  ta.style.position = "fixed"
+  ta.style.left = "-9999px"
 
   document.body.appendChild(ta)
 
@@ -647,9 +639,10 @@ function fallbackCopy(text){
 
 function clearBox(id){
 
-  const el=document.getElementById(id)
+  const el = document.getElementById(id)
+  if(!el) return
 
-  el.value=""
+  el.value = ""
 
   toast("Cleared")
 
@@ -663,27 +656,21 @@ function clearBox(id){
 function openLink(url){
 
   if(isMobile){
-
     window.location.href = url
-
   }else{
-
     window.open(url,"_blank","noopener")
-
   }
 
 }
+
 
 // ------------------------------
 // Tracking
 // ------------------------------
 
 function getSrc(){
-
   return localStorage.getItem("sg_src") || "unknown"
-
 }
-
 
 function setSrc(src){
 
@@ -698,6 +685,10 @@ function setSrc(src){
 }
 
 
+// ------------------------------
+// Demo URL Builder
+// ------------------------------
+
 function getTrackedDemoUrl(){
 
   const src = encodeURIComponent(getSrc())
@@ -706,55 +697,50 @@ function getTrackedDemoUrl(){
 
 }
 
-
 function openTrackedDemo(){
-
   openLink(getTrackedDemoUrl())
-
 }
 
+
+// ------------------------------
+// Copy Demo Link
+// ------------------------------
 
 async function copyTrackedDemo(){
 
   const url = getTrackedDemoUrl()
 
   try{
-
     await navigator.clipboard.writeText(url)
-
   }catch{
-
     fallbackCopy(url)
-
   }
 
   toast("Demo link copied ✅")
 
 }
 
-
 async function copyTrackedDemoWithLabel(){
 
   const src = getSrc()
-
   const url = getTrackedDemoUrl()
 
   const text = `SignalGate Demo (${src})\n${url}`
 
   try{
-
     await navigator.clipboard.writeText(text)
-
   }catch{
-
     fallbackCopy(text)
-
   }
 
   toast("Copied ✅")
 
 }
 
+
+// ------------------------------
+// Reset Tracking
+// ------------------------------
 
 function resetTracking(){
 
@@ -768,11 +754,9 @@ function resetTracking(){
 
 }
 
-
 async function copyTrackingSummary(){
 
   const src = getSrc()
-
   const demo = getTrackedDemoUrl()
 
   const text =
@@ -782,18 +766,15 @@ async function copyTrackingSummary(){
 - time: ${new Date().toISOString()}`
 
   try{
-
     await navigator.clipboard.writeText(text)
-
   }catch{
-
     fallbackCopy(text)
-
   }
 
   toast("Copied ✅")
 
 }
+
 
 // ------------------------------
 // KPI Tracking
@@ -811,9 +792,7 @@ function getKPI(){
 }
 
 function saveKPI(data){
-
   localStorage.setItem("sg_kpi", JSON.stringify(data))
-
 }
 
 function renderKPI(){
@@ -857,6 +836,7 @@ function resetKPI(){
 
 }
 
+
 // ------------------------------
 // UI Rendering
 // ------------------------------
@@ -864,20 +844,19 @@ function resetKPI(){
 function renderSrc(){
 
   const src = getSrc()
-
   const link = getTrackedDemoUrl()
 
-  document.getElementById("currentSrc").textContent = src
+  const srcBox = document.getElementById("currentSrc")
+  const linkBox = document.getElementById("currentDemoLink")
 
-  document.getElementById("currentDemoLink").textContent = link
+  if(srcBox) srcBox.textContent = src
+  if(linkBox) linkBox.textContent = link
 
 }
-
 
 function renderDM(){
 
   const src = getSrc()
-
   const link = getTrackedDemoUrl()
 
   const dm =
@@ -896,21 +875,16 @@ https://7771435393392.gumroad.com/l/ygkkp`
 
 }
 
-
 function setActivePill(src){
 
-  const pills=document.querySelectorAll("#sourcePills .pill")
+  const pills = document.querySelectorAll("#sourcePills .pill")
 
   pills.forEach(p => p.classList.remove("active"))
 
-  pills.forEach(p => {
-
+  pills.forEach(p=>{
     if(p.getAttribute("data-src") === src){
-
       p.classList.add("active")
-
     }
-
   })
 
 }
@@ -922,24 +896,18 @@ function setActivePill(src){
 
 function openFiveThreads(){
 
-  const urls=[
-
+  const urls = [
     "https://www.facebook.com/search/posts/?q=appraisal",
     "https://www.facebook.com/search/posts/?q=appraisal%20gap",
     "https://www.facebook.com/search/posts/?q=low%20appraisal",
     "https://www.facebook.com/search/posts/?q=deal%20fell%20through",
     "https://www.facebook.com/search/posts/?q=house%20appraisal"
-
   ]
 
   if(isMobile){
-
     window.location.href = urls[0]
-
   }else{
-
-    urls.forEach(url => window.open(url,"_blank"))
-
+    urls.forEach(url => window.open(url,"_blank","noopener"))
   }
 
 }
@@ -952,29 +920,21 @@ function openFiveThreads(){
 document.addEventListener("DOMContentLoaded", () => {
 
   // mobile thread finder switch
-
   if(isMobile){
 
-    const d=document.getElementById("threadFinderDesktop")
+    const d = document.getElementById("threadFinderDesktop")
+    const m = document.getElementById("threadFinderMobile")
 
-    const m=document.getElementById("threadFinderMobile")
-
-    if(d) d.style.display="none"
-
-    if(m) m.style.display="block"
+    if(d) d.style.display = "none"
+    if(m) m.style.display = "block"
 
   }
 
   // source pills
-
   document.querySelectorAll("#sourcePills .pill").forEach(pill => {
-
     pill.addEventListener("click", () => {
-
       setSrc(pill.getAttribute("data-src"))
-
     })
-
   })
 
   renderSrc()
