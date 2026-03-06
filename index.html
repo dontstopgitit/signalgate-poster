@@ -800,11 +800,13 @@ function renderKPI(){
 
   const kpi = getKPI()
 
-  if(!document.getElementById("kpiReplies")) return
+  const repliesEl = document.getElementById("kpiReplies")
+  const postsEl = document.getElementById("kpiPosts")
+  const dmsEl = document.getElementById("kpiDMs")
 
-  document.getElementById("kpiReplies").textContent = kpi.replies
-  document.getElementById("kpiPosts").textContent = kpi.posts
-  document.getElementById("kpiDMs").textContent = kpi.dms
+  if(repliesEl) repliesEl.textContent = kpi.replies
+  if(postsEl) postsEl.textContent = kpi.posts
+  if(dmsEl) dmsEl.textContent = kpi.dms
 
 }
 
