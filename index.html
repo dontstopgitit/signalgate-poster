@@ -896,27 +896,11 @@ async function loadDashboard(){
 
   try{
 
-    const res = await fetch(
-      "https://script.google.com/macros/s/AKfycbxGascJPZFP3FtbG7JU76dJzY1eoTCqdaWJWCWpLHMMatHzfRp9GHK3WjmcY5ZrwzLh/exec"
-    )
+    const res = await fetch("/dashboard")
 
-    const data = await res.json()
+    const rows = await res.json()
 
-    const today = new Date().toISOString().slice(0,10)
-
-    let runs = 0
-
-    data.forEach(row=>{
-      if(row.time && row.time.startsWith(today)){
-        runs++
-      }
-    })
-
-    const el = document.getElementById("kpiRuns")
-
-    if(el){
-      el.textContent = runs
-    }
+    document.getElementById("kpiRuns").textContent = rows.length
 
   }catch(err){
 
