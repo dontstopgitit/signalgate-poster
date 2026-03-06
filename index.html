@@ -889,7 +889,43 @@ function setActivePill(src){
 
 }
 
+// ------------------------------
+// Thread opener
+// ------------------------------
+async function loadDashboard(){
 
+  try{
+
+    const res = await fetch(
+      "https://script.google.com/macros/s/AKfycbx0sBTSKm0YWHGnjv2ekrYpC_wiNfzAPoZZf6U9aMXlaGR9J3vsq787Cm-LzBvgbUc/exec"
+    )
+
+    const data = await res.json()
+
+    const today = new Date().toISOString().slice(0,10)
+
+    let runs = 0
+
+    data.forEach(row=>{
+      if(row.time && row.time.startsWith(today)){
+        runs++
+      }
+    })
+
+    const el = document.getElementById("kpiRuns")
+
+    if(el){
+      el.textContent = runs
+    }
+
+  }catch(err){
+
+    console.warn("Dashboard load failed", err)
+
+  }
+
+}
+  
 // ------------------------------
 // Thread opener
 // ------------------------------
@@ -941,6 +977,7 @@ document.addEventListener("DOMContentLoaded", () => {
   renderDM()
   renderKPI()
   setActivePill(getSrc())
+  loadDashboard()
 
 })
 
